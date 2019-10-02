@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getSum } from '../helpers';
 import styles from './Balance.module.css';
 
-function getSum(arr, type) {
-  return arr
-    .filter(el => el.type === type)
-    .reduce((acc, el) => acc + Number(el.amount), 0);
-}
-
-const Balance = ({ transactions, balance }) => {
+const Balance = ({ transactions }) => {
   return (
     <section className={styles.balance}>
       <span role="img" aria-label="deposit" className={styles.arrowUp}>
@@ -19,7 +14,10 @@ const Balance = ({ transactions, balance }) => {
         ⬇️
         {getSum(transactions, 'Withdrawal')}$
       </span>
-      <span>Balance: {balance}$</span>
+      <span>
+        Balance:
+        {getSum(transactions, 'Deposit') - getSum(transactions, 'Withdrawal')}$
+      </span>
     </section>
   );
 };
@@ -33,11 +31,6 @@ Balance.propTypes = {
       date: PropTypes.string.isRequired,
     }).isRequired,
   ).isRequired,
-  balance: PropTypes.number.isRequired,
-};
-
-Balance.defaultProps = {
-  // bla: 'test',
 };
 
 export default Balance;

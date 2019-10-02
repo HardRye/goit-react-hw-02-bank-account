@@ -34,8 +34,4 @@ TransactionHistory.propTypes = {
   ).isRequired,
 };
 
-TransactionHistory.defaultProps = {
-  // bla: 'test',
-};
-
 export default TransactionHistory;

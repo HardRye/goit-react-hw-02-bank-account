@@ -35,8 +35,4 @@ Controls.propTypes = {
   handleTransaction: PropTypes.func.isRequired,
 };
 
-Controls.defaultProps = {
-  // bla: 'test',
-};
-
 export default Controls;

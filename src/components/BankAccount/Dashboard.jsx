@@ -6,45 +6,39 @@ import 'react-toastify/dist/ReactToastify.css';
 import Controls from './Controls/Controls';
 import Balance from './Balance/Balance';
 import TransactionHistory from './TransactionHistory/TransactionHistory';
-
-const messages = {
-  outOfMoney: 'На счету недостаточно средств для проведения операции!',
-  emptyField: 'Введите сумму для проведения операции!',
-};
+import { getSum, messages } from './helpers';
 
 class Dashboard extends Component {
   state = {
     transactions: [],
-    balance: 0,
     inputValue: '',
   };
 
-  handleInput = ({ target }) => {
-    this.setState({ inputValue: target.value });
+  handleInput = ({ target: { value } }) => {
+    this.setState({ inputValue: value });
   };
 
-  handleTransaction = ({ target }) => {
-    const { balance, inputValue } = this.state;
+  handleTransaction = ({ target: { name } }) => {
+    const { inputValue, transactions } = this.state;
+    const balance =
+      transactions.length === 0
+        ? 0
+        : getSum(transactions, 'Deposit') - getSum(transactions, 'Withdrawal');
 
     if (Number(inputValue) <= 0) {
-      return toast.error(messages.emptyField);
-    }
-
-    if (target.name !== 'Deposit' && Number(inputValue) > balance) {
+      toast.error(messages.emptyField);
+    } else if (name !== 'Deposit' && Number(inputValue) > balance) {
       toast.error(messages.outOfMoney);
     } else {
       const newTransaction = {
         id: shortid.generate(),
-        type: target.name,
+        type: name,
         amount: inputValue,
         date: new Date().toLocaleString('en-US', { hour12: false }),
       };
+
       this.setState(prevState => ({
         transactions: [...prevState.transactions, newTransaction],
-        balance:
-          target.name === 'Deposit'
-            ? prevState.balance + Number(newTransaction.amount)
-            : prevState.balance - Number(newTransaction.amount),
       }));
     }
 
@@ -56,7 +50,7 @@ class Dashboard extends Component {
   };
 
   render() {
-    const { transactions, balance, inputValue } = this.state;
+    const { transactions, inputValue } = this.state;
 
     return (
       <div className="dashboard">
@@ -65,7 +59,7 @@ class Dashboard extends Component {
           handleInput={this.handleInput}
           handleTransaction={this.handleTransaction}
         />
-        <Balance balance={balance} transactions={transactions} />
+        <Balance transactions={transactions} />
         <TransactionHistory transactions={transactions} />
         <ToastContainer autoClose={2500} position="bottom-right" />
       </div>
